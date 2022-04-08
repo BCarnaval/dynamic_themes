@@ -89,8 +89,8 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">=3.8"
-content-hash = "00b3874b0c74aaf9f833ad36c8ebead1c6bae3235960882fdcae7915754ebd15"
+python-versions = "^3.10"
+content-hash = "045563ebb99966e3a521b9685ee74a16323d9b2143697baa833fa582f351e3ef"
 
 [metadata.files]
 autopep8 = [
