@@ -78,7 +78,6 @@ get_frm_in_array () {
     # Total minutes between frms
     total=$(echo "${hours_between_frms} * 60 + \
                                             ${minutes_between_frms}" | bc)
-    # Get actual frame number
     frm_number=$(expr ${SHIFT_IN} '+' ${shift} '/' ${total})
 
     # If frame number's above maximum frame number of given directory -> set 
@@ -87,7 +86,6 @@ get_frm_in_array () {
         frm_number=$(expr ${length} '-' 1)
     fi
 
-    # Find images that fits the right frame number
     for image in ${ARRAY[@]}; do
         if [[ "${image}" == *"_${frm_number}."* ]]; then
             ARRAY_FRM=${image}
@@ -139,6 +137,11 @@ set_cron_task () {
     rm mycron
 }
 
+kill_sched () {
+    echo -e "${GREEN}[@] Schedule killed with success: ${WHITE}Use 'dyth' command to start program."
+    reset_terminal
+}
+
 main () {
     build_images_array
     get_hours_to_schedule
@@ -154,7 +157,7 @@ usage () {
 }
 
 # Get command line options
-while getopts ":d:i:s:h" opt; do
+while getopts ":d:i:s:kh" opt; do
     case ${opt} in
         d)
             DIRECTORY=${OPTARG}
@@ -165,6 +168,10 @@ while getopts ":d:i:s:h" opt; do
             ;;
         s)
             SHIFT_IN=${OPTARG}
+            ;;
+        k)
+            kill_sched
+            exit 0
             ;;
         h)
             usage
