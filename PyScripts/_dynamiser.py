@@ -4,6 +4,10 @@ import time
 
 import _gen_daemon
 
+# Colors used in terminal messages
+RED, GREEN, ORANGE = '\033[31m', '\033[32m', '\033[33m',
+CYAN, WHITE = '\033[36m', '\033[37m'
+
 
 class Dynamiser(_gen_daemon.Daemon):
     def run(self):

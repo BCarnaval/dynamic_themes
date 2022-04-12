@@ -19,6 +19,11 @@ import atexit
 from signal import signal, SIGTERM
 
 
+# Colors used in terminal messages
+RED, GREEN, ORANGE = '\033[31m', '\033[32m', '\033[33m',
+CYAN, WHITE = '\033[36m', '\033[37m'
+
+
 class Daemon:
     """A generic daemon class.
 
@@ -43,7 +48,7 @@ class Daemon:
                 # exit first parent
                 sys.exit(0)
         except OSError as e:
-            sys.stderr.write("fork #1 failed: %d (%s)\n" %
+            sys.stderr.write(f"{RED}[X] Fork #1 failed: {WHITE}%d (%s)\n" %
                              (e.errno, e.strerror))
             sys.exit(1)
 
@@ -58,7 +63,7 @@ class Daemon:
                 # exit from second parent
                 sys.exit(0)
         except OSError as e:
-            sys.stderr.write("fork #2 failed: %d (%s)\n" %
+            sys.stderr.write(f"{RED}[X] Fork #2 failed: {WHITE}%d (%s)\n" %
                              (e.errno, e.strerror))
             sys.exit(1)
 
@@ -97,7 +102,7 @@ class Daemon:
             pid = None
 
         if pid:
-            message = "pidfile %s already exist. Daemon already running?\n"
+            message = f"{ORANGE}[!] Pid file %s already exist: {WHITE}Daemon already running?\n"
             sys.stderr.write(message % self.pidfile)
             sys.exit(1)
 
@@ -118,7 +123,7 @@ class Daemon:
             pid = None
 
         if not pid:
-            message = "pidfile %s does not exist. Daemon not running?\n"
+            message = f"{ORANGE}[!] Pid file %s does not exist: {WHITE}Daemon not running?\n"
             sys.stderr.write(message % self.pidfile)
             return  # not an error in a restart
 
@@ -127,6 +132,8 @@ class Daemon:
             while 1:
                 os.kill(pid, SIGTERM)
                 time.sleep(0.1)
+                print(
+                    f"{GREEN}[@] Process with 'id': {WHITE}{pid}{GREEN} has properly been killed.")
         except OSError as err:
             err = str(err)
             if err.find("No such process") > 0:
