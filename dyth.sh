@@ -119,27 +119,20 @@ set_frm_from_dir () {
     fi
 }
 
-set_cron_task () {
-    # Delete old css present in /dynamic_themes/current_css/
-    rm dynamic_themes/current_css/*
-    # Inserting the new one
-    cp ${DIRECTORY}${SET_FRM} dynamic_themes/current_css
-
-    # Delete previous cron job
-    crontab -l | grep -v 'bash dynamic_themes/test.sh' | crontab -
-    # Write out current crontab
-    crontab -l > mycron
-    # Echo new cron into cron file
-    echo "*/${delay_between_frms} * * * * bash dynamic_themes/test.sh ${1} ${2} ${3} ${4}" >> mycron
-    # Install new cron file
-    crontab mycron
-    # Delete mycron file
-    rm mycron
+setup_task () {
+    ./PyScripts/_dynamiser.py start
+    reset_terminal
 }
 
 kill_sched () {
-    echo -e "${GREEN}[@] Schedule killed with success: ${WHITE}Use 'dyth' command to start program."
+    ./PyScripts/_dynamiser.py stop
     reset_terminal
+}
+
+# Usage
+usage () {
+    clear
+    man ./man_page.1
 }
 
 main () {
@@ -148,12 +141,7 @@ main () {
     get_clock_shift
     get_frm_in_array
     set_frm_from_dir
-}
-
-# Usage
-usage () {
-    clear
-    man ./man_page.1
+    setup_task
 }
 
 # Get command line options
