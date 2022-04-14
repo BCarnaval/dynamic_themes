@@ -1,22 +1,57 @@
 #!/usr/bin/env bash
 
-# Colors used in terminal messages
-RED="$(printf '\033[31m')"
-GREEN="$(printf '\033[32m')"
-ORANGE="$(printf '\033[33m')"
-CYAN="$(printf '\033[36m')"
+# Author  : Antoine de Lagrave
+# Mail    : antoinedelagrave@hotmail.com
+# Github  : @BCarnaval
+
+# dynamic_themes : Sets wallpaper, terminal & IDE themes
+# Sheduled using Python background daemon.
+
+RED="$(printf '\033[31m')" GREEN="$(printf '\033[32m')"
+ORANGE="$(printf '\033[33m')" CYAN="$(printf '\033[36m')"
 WHITE="$(printf '\033[37m')"
 
-# Default variables
 BOT_SCHED=0
 TOP_SCHED=24
 SHIFT_IN=0
+CURRENT_DIR=$( pwd )
+PROJECT_DIR=/usr/share/dynamic_themes
 
 reset_terminal () {
     tput init
 }
 
+# Exit if 'pywal' not found on machine
+check_pywal() {
+    if [[ -x $( command -v wal ) ]]; then
+        reset_terminal
+        clear
+    else
+        echo -e "${RED}[X] 'pywal' is not installed on your system:${WHITE} exiting..."
+        reset_terminal
+        clear
+        exit 1
+    fi
+}
+
+clean_images_names () {
+    cd ${DIRECTORY}
+    for file in *; do
+        if [[ -f ${file} ]]; then
+            mv "${file}" $(echo "${file}" | sed -e 's/[^A-Za-z0-9._-]/_/g')
+        else
+            echo -e "${RED}[X] Given directory is unreadable."
+            reset_terminal
+            cd ${CURRENT_DIR}
+            exit 1
+        fi
+    done
+    echo -e "${GREEN}[@] File names of given directory cleaned."
+    cd ${CURRENT_DIR}
+}
+
 build_images_array () {
+    clean_images_names
     ARRAY=()
     idx=1
     for file in ${DIRECTORY}*; do
@@ -30,14 +65,13 @@ build_images_array () {
                 ;;
         esac
     done
-
     reset_terminal
 
     # Verifying if array's empty
     length=$(expr ${#ARRAY[@]} '+' 1)
     if [[ ${length} -eq 1 ]]; then
-        echo -e "${RED}[X] No images has been found in: ${WHITE}${DIRECTORY}"
-        exit 0
+        echo -e "${RED}[X] No images has been found in: ${WHITE}${DIRECTORY}."
+        exit 1
     fi
 }
 
@@ -76,16 +110,16 @@ get_frm_in_array () {
                                     (${hours_between_frms} * 60))/1" | bc)
 
     # Total minutes between frms
-    total=$(echo "${hours_between_frms} * 60 + \
+    TOTAL=$(echo "${hours_between_frms} * 60 + \
                                             ${minutes_between_frms}" | bc)
-    frm_number=$(expr ${SHIFT_IN} '+' ${shift} '/' ${total})
+    echo -e "${GREEN}[@] Changing themes every: ${WHITE}${TOTAL} ${GREEN}minutes."
+    frm_number=$(expr ${SHIFT_IN} '+' ${shift} '/' ${TOTAL} '+' 1)
 
     # If frame number's above maximum frame number of given directory -> set 
     # to last image
     if [[ ${frm_number} -gt ${length} ]]; then
         frm_number=$(expr ${length} '-' 1)
     fi
-
     for image in ${ARRAY[@]}; do
         if [[ "${image}" == *"_${frm_number}."* ]]; then
             ARRAY_FRM=${image}
@@ -93,58 +127,67 @@ get_frm_in_array () {
     done
 }
 
+# Progress animation functions
+sp="/-\|"
+sc=0
+spin() {
+   printf "\r${GREEN}[@] ${1}${WHITE}${sp:sc++:1}"
+   ((sc==${#sp})) && sc=0
+}
+endspin() {
+   printf "\r%s\n" "$@"
+}
+
 set_frm_from_dir () {
-    progress=("#")
     for image in ${DIRECTORY}*; do
+        spin "Browsing through images..."
+        sleep 0.1
         case ${ARRAY_FRM} in
             *"${image%.*}"*)
                 SET_FRM=${image}
                 ;;
             *)
-                echo -e "${WHITE}Browsing directory: ${GREEN}${progress[*]}"
-                progress+="#"
-                sleep 0.05
-                clear
                 ;;
         esac
     done
+    endspin
 
     if [[ "${SET_FRM}" ]]; then
-        echo -e "${GREEN}[@] Using image: ${WHITE}${SET_FRM}"
+        echo -e "${GREEN}[@] Using image: ${WHITE}${SET_FRM##*/} ${GREEN} as initial frame."
         reset_terminal
     else
-        echo -e "${RED}[X] No files matches frame number in: ${WHITE}${DIRECTORY}"
+        echo -e "${RED}[X] No files matches frame number in: ${WHITE}${DIRECTORY}."
         reset_terminal
-        exit 0
+        exit 1
     fi
 }
 
 setup_task () {
-    ./PyScripts/_dynamiser.py start
+    ${PROJECT_DIR}/PyScripts/dynamiser.py start ${DIRECTORY} ${SET_FRM} ${TOTAL}
     reset_terminal
 }
 
-kill_sched () {
-    ./PyScripts/_dynamiser.py stop
+kill_task () {
+    ${PROJECT_DIR}/PyScripts/dynamiser.py stop
     reset_terminal
 }
 
 # Usage
 usage () {
     clear
-    man ./man_page.1
+    man ${PROJECT_DIR}/man_page.1
 }
 
 main () {
+    check_pywal
     build_images_array
     get_hours_to_schedule
     get_clock_shift
     get_frm_in_array
     set_frm_from_dir
-    setup_task
+    # setup_task
 }
 
-# Get command line options
 while getopts ":d:i:s:kh" opt; do
     case ${opt} in
         d)
@@ -158,7 +201,7 @@ while getopts ":d:i:s:kh" opt; do
             SHIFT_IN=${OPTARG}
             ;;
         k)
-            kill_sched
+            kill_task
             exit 0
             ;;
         h)
@@ -166,22 +209,22 @@ while getopts ":d:i:s:kh" opt; do
             exit 0
             ;;
         \?)
-            echo -e "${RED}[X] Unknown option '${OPTARG}': ${WHITE}run $(basename $0) -h"
+            echo -e "${RED}[X] Unknown option '${OPTARG}': ${WHITE}run $(basename $0) -h."
             reset_terminal
             exit 1
             ;;
         :)
-            echo -e "${ORANGE}[!] Invalid: ${WHITE}-$OPTARG requires an argument."
+            echo -e "${ORANGE}[!] Invalid: ${WHITE}'$OPTARG' requires an argument."
             reset_terminal
             exit 1
             ;;
     esac
 done
 
-# Main conditionnal run
+# Main run
 if [[ "$DIRECTORY" ]]; then
     main
 else
     usage
-    exit 1
+    exit 0
 fi

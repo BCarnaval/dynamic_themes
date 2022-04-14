@@ -139,6 +139,8 @@ class Daemon:
             if err.find("No such process") > 0:
                 if os.path.exists(self.pidfile):
                     os.remove(self.pidfile)
+                print(
+                    f"{GREEN}[@] Process with 'id': {WHITE}{pid}{GREEN} has properly been killed.")
             else:
                 print(str(err))
                 sys.exit(1)
