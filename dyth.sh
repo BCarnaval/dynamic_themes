@@ -15,7 +15,7 @@ BOT_SCHED=0
 TOP_SCHED=24
 SHIFT_IN=0
 CURRENT_DIR=$( pwd )
-PROJECT_DIR=/usr/share/dynamic_themes
+PROJECT_DIR=/usr/local/share/dynamic_themes
 
 reset_terminal () {
     tput init
@@ -185,7 +185,7 @@ main () {
     get_clock_shift
     get_frm_in_array
     set_frm_from_dir
-    # setup_task
+    setup_task
 }
 
 while getopts ":d:i:s:kh" opt; do

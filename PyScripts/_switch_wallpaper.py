@@ -14,6 +14,6 @@ def switch_wall(path):
         desk = se.desktops[its.display_name == d]
         desk.picture.set(mactypes.File(f))
 
-    command = f'/Users/antoinedelagrave/dynamic_themes/_switch_iterm.sh {path}'
+    command = f'/usr/local/share/dynamic_themes/_switch_iterm.sh {path}'
     os.system(command)
     return

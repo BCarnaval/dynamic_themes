@@ -7,7 +7,7 @@ ORANGE="$(printf '\033[33m')"
 CYAN="$(printf '\033[36m')"
 WHITE="$(printf '\033[37m')"
 
-DESTINATION=/usr/share
+DESTINATION=/usr/local/share
 
 rm_directory () {
     echo -e "${ORANGE}[!] Uninstalling dynamic_themes..."

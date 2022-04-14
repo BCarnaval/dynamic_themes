@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # From "A simple unix/linux daemon in Python" by Sander Marechal
 # See http://stackoverflow.com/a/473702/1422096 and http://web.archive.org/
 # web/20131017130434/http://www.jejik.com/articles/2007/02/a_simple_unix_linux_
@@ -30,7 +31,9 @@ class Daemon:
     Usage: subclass the Daemon class and override the run() method
     """
 
-    def __init__(self, pidfile='_.pid', stdin='/dev/null', stdout='/dev/null',
+    def __init__(self, pidfile='/usr/local/share/dynamic_themes/_.pid',
+                 stdin='/dev/null',
+                 stdout='/dev/null',
                  stderr='/dev/null'):
         self.stdin = stdin
         self.stdout = stdout
