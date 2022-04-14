@@ -12,7 +12,9 @@ CYAN, WHITE = '\033[36m', '\033[37m'
 
 
 class Dynamiser(_gen_daemon.Daemon):
-    def __init__(self, pidfile='_.pid', stdin='/dev/null', stdout='/dev/null',
+    def __init__(self, pidfile='/usr/local/share/dynamic_themes/_.pid',
+                 stdin='/dev/null',
+                 stdout='/dev/null',
                  stderr='/dev/null'):
         super().__init__(pidfile, stdin, stdout, stderr)
 
