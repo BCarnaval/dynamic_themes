@@ -31,14 +31,11 @@ class Dynamiser(_gen_daemon.Daemon):
                                  os.path.join(self.directory, x))
                              )
 
-        # TODO: Change between images
+        # TODO: Change between images & APSheduler support
         self.init_frame = str(sys.argv[3])
         self.delay = int(sys.argv[4])
         command = f'/usr/local/share/dynamic_themes/PyScripts/_switch_wallpaper.py {self.init_frame}'
-        self.sched.add_job(lambda: os.system(command),
-                           'interval',
-                           minutes=self.delay)
-        self.sched.start()
+        os.system(command)
         return
 
     def quit(self):
