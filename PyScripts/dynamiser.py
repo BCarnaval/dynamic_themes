@@ -31,14 +31,14 @@ class Dynamiser(_gen_daemon.Daemon):
                                  os.path.join(self.directory, x))
                              )
 
+        # TODO: Change between images
         self.init_frame = str(sys.argv[3])
         self.delay = int(sys.argv[4])
         command = f'/usr/local/share/dynamic_themes/PyScripts/_switch_wallpaper.py {self.init_frame}'
-        os.system(command)
-        # self.sched.add_job(lambda: switch_wall(self.init_frame),
-        #                    'interval',
-        #                    minutes=self.delay)
-        # self.sched.start()
+        self.sched.add_job(lambda: os.system(command),
+                           'interval',
+                           minutes=self.delay)
+        self.sched.start()
         return
 
     def quit(self):
