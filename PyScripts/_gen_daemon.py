@@ -31,7 +31,7 @@ class Daemon:
     Usage: subclass the Daemon class and override the run() method
     """
 
-    def __init__(self, pidfile='/usr/local/share/dynamic_themes/_.pid',
+    def __init__(self, pidfile='_.pid',
                  stdin='/dev/null',
                  stdout='/dev/null',
                  stderr='/dev/null'):

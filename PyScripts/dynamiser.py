@@ -5,7 +5,6 @@ import glob
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import _gen_daemon
-from _switch_wallpaper import switch_wall
 
 # Colors used in terminal messages
 RED, GREEN, ORANGE = '\033[31m', '\033[32m', '\033[33m',
@@ -24,20 +23,20 @@ class Dynamiser(_gen_daemon.Daemon):
         """
         self.directory = sys.argv[2]
 
-        frames = glob.glob(f'{sys.argv[2]}*')
+        frames = glob.glob(f'{self.directory}*')
         self.frames = sorted(frames,
                              key=lambda x: os.path.getmtime(
-                                 os.path.join(sys.argv[2], x))
+                                 os.path.join(self.directory, x))
                              )
 
-        self.init_frame = sys.argv[3]
-        self.delay = sys.argv[4]
-
-        switch_wall(self.init_frame)
-        self.sched.add_job(lambda: switch_wall(self.init_frame),
-                           'interval',
-                           minutes=self.delay)
-        self.sched.start()
+        self.init_frame = str(sys.argv[3])
+        self.delay = int(sys.argv[4])
+        command = f'/usr/local/share/dynamic_themes/PyScripts/_switch_wallpaper.py {self.init_frame}'
+        os.system(command)
+        # self.sched.add_job(lambda: switch_wall(self.init_frame),
+        #                    'interval',
+        #                    minutes=self.delay)
+        # self.sched.start()
         return
 
     def quit(self):
