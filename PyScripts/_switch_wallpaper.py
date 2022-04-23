@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import sys
 from appscript import app, its, mactypes
 
@@ -14,9 +13,6 @@ def switch_wall(path):
     for d in desktops:
         desk = se.desktops[its.display_name == d]
         desk.picture.set(mactypes.File(f))
-
-    command = f'/usr/local/share/dynamic_themes/_switch_iterm.sh {path}'
-    os.system(command)
     return
 
 

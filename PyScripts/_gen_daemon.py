@@ -18,7 +18,7 @@ import os
 import time
 import atexit
 from signal import signal, SIGTERM
-
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Colors used in terminal messages
 RED, GREEN, ORANGE = '\033[31m', '\033[32m', '\033[33m',
@@ -39,6 +39,7 @@ class Daemon:
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
+        self.worker = BackgroundScheduler()
 
     def daemonize(self):
         """Do the UNIX double-fork magic, see Stevens' "Advanced 
@@ -136,14 +137,14 @@ class Daemon:
                 os.kill(pid, SIGTERM)
                 time.sleep(0.1)
                 print(
-                    f"{GREEN}[@] Process with 'id': {WHITE}{pid}{GREEN} has properly been killed.")
+                    f"{GREEN}[@] Process with id: {WHITE}'{pid}'{GREEN} has properly been killed.")
         except OSError as err:
             err = str(err)
             if err.find("No such process") > 0:
                 if os.path.exists(self.pidfile):
                     os.remove(self.pidfile)
                 print(
-                    f"{GREEN}[@] Process with 'id': {WHITE}{pid}{GREEN} has properly been killed.")
+                    f"{GREEN}[@] Process with id: {WHITE}'{pid}'{GREEN} has properly been killed.")
             else:
                 print(str(err))
                 sys.exit(1)

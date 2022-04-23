@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import os
 import sys
-import glob
-from apscheduler.schedulers.background import BackgroundScheduler
 
 import _gen_daemon
 
@@ -18,38 +16,29 @@ class Dynamiser(_gen_daemon.Daemon):
                  stderr='/dev/null'):
         super().__init__(pidfile, stdin, stdout, stderr)
 
-        self.sched = BackgroundScheduler()
-
     def run(self):
         """Docs
         """
-        self.directory = sys.argv[2]
-
-        frames = glob.glob(f'{self.directory}*')
-        self.frames = sorted(frames,
-                             key=lambda x: os.path.getmtime(
-                                 os.path.join(self.directory, x))
-                             )
-
-        # TODO: Change between images & APSheduler support
-        self.init_frame = str(sys.argv[3])
-        self.delay = int(sys.argv[4])
-        command = f'/usr/local/share/dynamic_themes/PyScripts/_switch_wallpaper.py {self.init_frame}'
+        command = f"/usr/local/share/dynamic_themes/set_themes.sh {directory} {bot_sched} {schedule} {shift}"
         os.system(command)
+        self.worker.add_job(lambda: os.system(command),
+                            trigger='interval', minutes=delay)
+        self.worker.start()
         return
 
     def quit(self):
         """Docs
         """
-        self.sched.shutdown()
+        self.worker.shutdown()
         return
 
 
-daemon = Dynamiser()
+process = Dynamiser()
 
 if 'start' == sys.argv[1]:
-    daemon.start()
+    _, __, directory, bot_sched, schedule, shift, delay = sys.argv
+    process.start()
 elif 'stop' == sys.argv[1]:
-    daemon.stop()
+    process.stop()
 elif 'restart' == sys.argv[1]:
-    daemon.restart()
+    process.restart()

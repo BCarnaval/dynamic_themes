@@ -27,12 +27,14 @@ fill_directory () {
     sudo cp -r ${CURRENT_DIR}/dyth.sh ${DESTINATION}/dynamic_themes
     sudo cp -r ${CURRENT_DIR}/_switch_iterm.sh ${DESTINATION}/dynamic_themes
     sudo cp -r ${CURRENT_DIR}/uninstall.sh ${DESTINATION}/dynamic_themes
+    sudo cp -r ${CURRENT_DIR}/set_themes.sh ${DESTINATION}/dynamic_themes
     sudo cp -r ${CURRENT_DIR}/man_page.1 ${DESTINATION}/dynamic_themes
 
     # Make scripts executable
     sudo chmod +x ${DESTINATION}/dynamic_themes/dyth.sh
     sudo chmod +x ${DESTINATION}/dynamic_themes/uninstall.sh
     sudo chmod +x ${DESTINATION}/dynamic_themes/_switch_iterm.sh
+    sudo chmod +x ${DESTINATION}/dynamic_themes/set_themes.sh
     sudo chmod +x ${DESTINATION}/dynamic_themes/man_page.1
     for script in ${DESTINATION}/dynamic_themes/PyScripts/*; do
         if [[ -f ${script} ]]; then

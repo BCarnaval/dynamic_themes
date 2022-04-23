@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Author  : Antoine de Lagrave
-# Mail    : antoinedelagrave@hotmail.com
-# Github  : @BCarnaval
+# Author: Antoine de Lagrave
+# Email: antoinedelagrave@hotmail.com
+# GitHub: @BCarnaval
 
 # dynamic_themes : Sets wallpaper, terminal & IDE themes
 # Sheduled using Python background daemon.
@@ -117,7 +117,7 @@ get_frm_in_array () {
 
     # If frame number's above maximum frame number of given directory -> set 
     # to last image
-    if [[ ${frm_number} -gt ${length} ]]; then
+    if [[ ${frm_number} -gt ${length} ]] || [[ ${shift} -lt 0 ]]; then
         frm_number=$(expr ${length} '-' 1)
     fi
     for image in ${ARRAY[@]}; do
@@ -162,8 +162,16 @@ set_frm_from_dir () {
     fi
 }
 
+set_shell_theme () {
+    wal --backend colorz -i ${SET_FRM} -n
+}
+
+set_wallpaper_image () {
+    ${PROJECT_DIR}/PyScripts/_switch_wallpaper.py ${SET_FRM}
+}
+
 setup_task () {
-    ${PROJECT_DIR}/PyScripts/dynamiser.py start ${DIRECTORY} ${SET_FRM} ${TOTAL}
+    ${PROJECT_DIR}/PyScripts/dynamiser.py start ${DIRECTORY} ${BOT_SCHED} ${SCHEDULE} ${SHIFT_IN} ${TOTAL}
     reset_terminal
 }
 
@@ -172,7 +180,6 @@ kill_task () {
     reset_terminal
 }
 
-# Usage
 usage () {
     clear
     man ${PROJECT_DIR}/man_page.1
